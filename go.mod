@@ -6,6 +6,7 @@ require (
 	gioui.org v0.0.0-20210106084211-c030065af7bc
 	github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af
 	github.com/fogleman/gg v1.3.0
+	github.com/go-fonts/latin-modern v0.2.0
 	github.com/go-fonts/liberation v0.1.1
 	github.com/go-latex/latex v0.0.0-20210114174843-ccdd6a7c6d6e
 	github.com/phpdave11/gofpdf v1.4.2

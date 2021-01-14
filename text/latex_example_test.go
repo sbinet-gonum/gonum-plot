@@ -13,7 +13,7 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/cmpimg"
 	"gonum.org/v1/plot/font"
-	"gonum.org/v1/plot/font/liberation"
+	"gonum.org/v1/plot/font/latex"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/text"
 	"gonum.org/v1/plot/vg"
@@ -21,10 +21,12 @@ import (
 )
 
 func ExampleLatex() {
-	fonts := font.NewCache(liberation.Collection())
+	fonts := font.NewCache(latex.Collection())
 	plot.DefaultTextHandler = text.Latex{
 		Fonts: fonts,
 	}
+	plot.DefaultFont.Typeface = "LatinModern"
+	plotter.DefaultFont.Typeface = "LatinModern"
 
 	p, err := plot.New()
 	if err != nil {
@@ -46,12 +48,14 @@ func ExampleLatex() {
 			{X: -0.9, Y: -0.9},
 			{X: +0.6, Y: +0.0},
 			{X: +0.5, Y: -0.9},
+			{X: +0.6, Y: -0.9},
 		},
 		Labels: []string{
 			`$\frac{\sqrt{x}}{2\pi\Gamma\gamma}$`,
 			`$LaTeX$`,
 			"plain",
 			`$\frac{\sqrt{x}}{2\beta}$`,
+			"Agg",
 		},
 	})
 	if err != nil {
@@ -73,6 +77,9 @@ func ExampleLatex() {
 
 	labels.TextStyle[3].Font.Size = 24
 	labels.TextStyle[3].Rotation = math.Pi / 2
+
+	labels.TextStyle[4].Font.Size = 24
+	labels.TextStyle[4].Color = color.RGBA{R: 255, A: 255}
 
 	p.Add(labels)
 	p.Add(plotter.NewGlyphBoxes())
