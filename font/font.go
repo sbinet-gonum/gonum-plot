@@ -271,6 +271,21 @@ func (c *Cache) Has(fnt Font) bool {
 	return face != nil
 }
 
+// Collection returns the whole cached collection.
+func (c *Cache) Collection() Collection {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	out := make(Collection, 0, len(c.faces))
+	for k, v := range c.faces {
+		out = append(out, Face{
+			Font: k,
+			Face: v,
+		})
+	}
+	return out
+}
+
 func (c *Cache) lookup(key Font) *opentype.Font {
 	key.Size = 0
 
