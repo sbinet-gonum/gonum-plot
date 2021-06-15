@@ -7,6 +7,7 @@ package font
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"golang.org/x/image/font"
@@ -92,6 +93,34 @@ type Extents struct {
 type Face struct {
 	Font Font
 	Face *opentype.Font
+}
+
+func faceFrom(raw []byte) (Face, error) {
+	var face Face
+	otf, err := opentype.Parse(raw)
+	if err != nil {
+		return face, fmt.Errorf("font: could not parse font data: %w", err)
+	}
+
+	var buf sfnt.Buffer
+	name, err := otf.Name(&buf, sfnt.NameIDFamily)
+	if err != nil {
+		return face, fmt.Errorf("font: could not retrieve font name: %w", err)
+	}
+
+	full, err := otf.Name(&buf, sfnt.NameIDFull)
+	if err != nil {
+		return face, fmt.Errorf("font: could not retrieve font fullname: %w", err)
+	}
+
+	face.Font = Font{
+		Typeface: Typeface(name),
+		Style:    styleFrom(full),
+		Weight:   weightFrom(full),
+	}
+	face.Face = otf
+
+	return face, nil
 }
 
 // Name returns a fully qualified name for the given font.
@@ -235,6 +264,17 @@ func (c *Cache) Add(coll Collection) {
 	}
 }
 
+// AddFrom adds a font to the font cache.
+func (c *Cache) AddFrom(raw []byte) error {
+	face, err := faceFrom(raw)
+	if err != nil {
+		return fmt.Errorf("font: could not load font/face: %w", err)
+	}
+	c.Add(Collection([]Face{face}))
+
+	return nil
+}
+
 // Lookup returns the font Face corresponding to the provided Font descriptor,
 // with the provided font size set.
 //
@@ -319,6 +359,33 @@ func weightName(w font.Weight) string {
 	return fmt.Sprintf("weight(%d)", w)
 }
 
+func weightFrom(v string) font.Weight {
+	v = strings.ToLower(v)
+	switch {
+	case strings.Contains(v, "thin"):
+		return font.WeightThin
+	case strings.Contains(v, "extralight"):
+		return font.WeightExtraLight
+	case strings.Contains(v, "light"):
+		return font.WeightLight
+	case strings.Contains(v, "regular"):
+		return font.WeightNormal
+	case strings.Contains(v, "medium"):
+		return font.WeightMedium
+	case strings.Contains(v, "extrabold"):
+		return font.WeightExtraBold
+	case strings.Contains(v, "semibold"):
+		return font.WeightSemiBold
+	case strings.Contains(v, "bold"):
+		return font.WeightBold
+	case strings.Contains(v, "black"):
+		return font.WeightBlack
+
+	default:
+		return font.WeightNormal
+	}
+}
+
 func styleName(sty font.Style) string {
 	switch sty {
 	case font.StyleNormal:
@@ -329,4 +396,16 @@ func styleName(sty font.Style) string {
 		return "Oblique"
 	}
 	return fmt.Sprintf("style(%d)", sty)
+}
+
+func styleFrom(v string) font.Style {
+	v = strings.ToLower(v)
+	switch {
+	case strings.Contains(v, "italic"):
+		return font.StyleItalic
+	case strings.Contains(v, "oblique"):
+		return font.StyleOblique
+	default:
+		return font.StyleNormal
+	}
 }
