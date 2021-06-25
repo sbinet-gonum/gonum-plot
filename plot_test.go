@@ -128,3 +128,79 @@ func TestIssue514(t *testing.T) {
 		})
 	}
 }
+
+func TestDrawGlyphBoxes(t *testing.T) {
+	p := plot.New()
+
+	p.X.Min = 0
+	p.X.Max = 10
+	p.Y.Min = 0
+	p.Y.Max = 10
+
+	f1 := plotter.NewFunction(func(x float64) float64 { return 5 })
+	f1.LineStyle.Color = color.RGBA{R: 255, A: 255}
+
+	f2 := plotter.NewFunction(func(x float64) float64 { return 6 })
+	f2.LineStyle.Color = color.RGBA{B: 255, A: 255}
+
+	labels, err := plotter.NewLabels(plotter.XYLabels{
+		XYs: []plotter.XY{
+			{X: 2.5, Y: 2.5},
+			{X: 7.5, Y: 2.5},
+			{X: 7.5, Y: 7.5},
+			{X: 2.5, Y: 7.5},
+		},
+		Labels: []string{"Agg", "Bgg", "Cgg", "Dgg"},
+	})
+	if err != nil {
+		t.Fatalf("could not creates labels plotter: %+v", err)
+	}
+
+	p.Add(f1, f2, labels)
+	p.Add(plotter.NewGrid())
+
+	p.Legend.Add("fg1", f1)
+	p.Legend.Add("fg2", f2)
+	p.Legend.Top = true
+
+	c := vgimg.PngCanvas{
+		Canvas: vgimg.New(20*vg.Centimeter, 15*vg.Centimeter),
+	}
+
+	d := draw.New(c)
+	p.Draw(d)
+	p.DrawGlyphBoxes(d)
+
+	buf := new(bytes.Buffer)
+	_, err = c.WriteTo(buf)
+	if err != nil {
+		t.Fatalf("error: %+v", err)
+	}
+
+	err = ioutil.WriteFile("testdata/glyphbox.png", buf.Bytes(), 0644)
+	if err != nil {
+		t.Fatalf("could not save plot: %+v", err)
+	}
+
+	if *cmpimg.GenerateTestData {
+		// Recreate Golden images and exit.
+		err := ioutil.WriteFile("testdata/glyphbox_golden.png", buf.Bytes(), 0o644)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return
+	}
+
+	want, err := ioutil.ReadFile("testdata/glyphbox_golden.png")
+	if err != nil {
+		t.Fatalf("could not read reference file: %+v", err)
+	}
+
+	ok, err := cmpimg.Equal("png", buf.Bytes(), want)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok {
+		t.Fatalf("images differ")
+	}
+}

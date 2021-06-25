@@ -296,7 +296,11 @@ func (a horizontalAxis) draw(c draw.Canvas) {
 
 // GlyphBoxes returns the GlyphBoxes for the tick labels.
 func (a horizontalAxis) GlyphBoxes(*Plot) []GlyphBox {
-	var boxes []GlyphBox
+	var (
+		boxes []GlyphBox
+		ext   = a.Tick.Label.FontExtents()
+		desc  = ext.Height - ext.Ascent // descent + linegap
+	)
 	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max) {
 		if t.IsMinor() {
 			continue
@@ -305,6 +309,8 @@ func (a horizontalAxis) GlyphBoxes(*Plot) []GlyphBox {
 			X:         a.Norm(t.Value),
 			Rectangle: a.Tick.Label.Rectangle(t.Label),
 		}
+		box.Rectangle.Min.Y += desc
+		box.Rectangle.Max.Y += desc
 		boxes = append(boxes, box)
 	}
 	return boxes
@@ -397,7 +403,11 @@ func (a verticalAxis) draw(c draw.Canvas) {
 
 // GlyphBoxes returns the GlyphBoxes for the tick labels
 func (a verticalAxis) GlyphBoxes(*Plot) []GlyphBox {
-	var boxes []GlyphBox
+	var (
+		boxes []GlyphBox
+		ext   = a.Tick.Label.FontExtents()
+		desc  = ext.Height - ext.Ascent // descent + linegap
+	)
 	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max) {
 		if t.IsMinor() {
 			continue
@@ -406,6 +416,8 @@ func (a verticalAxis) GlyphBoxes(*Plot) []GlyphBox {
 			Y:         a.Norm(t.Value),
 			Rectangle: a.Tick.Label.Rectangle(t.Label),
 		}
+		box.Rectangle.Min.Y += desc
+		box.Rectangle.Max.Y += desc
 		boxes = append(boxes, box)
 	}
 	return boxes
