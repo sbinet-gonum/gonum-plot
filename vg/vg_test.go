@@ -75,7 +75,10 @@ func TestLineWidth(t *testing.T) {
 
 			if !ok {
 				got := strings.Replace(name, "_golden.", ".", 1)
-				_ = ioutil.WriteFile(got, buf.Bytes(), 0644)
+				err = ioutil.WriteFile(got, buf.Bytes(), 0644)
+				if err != nil {
+					t.Errorf("could not write plot image %q: %+v", got, err)
+				}
 				t.Errorf("image mismatch for %v:%s", w, typ)
 			}
 		}
