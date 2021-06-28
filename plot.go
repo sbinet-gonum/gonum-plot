@@ -214,24 +214,23 @@ func (p *Plot) DrawGlyphBoxes(c draw.Canvas) {
 		drawBox(dac, b)
 	}
 
-	{
-		p.X.sanitizeRange()
-		x := horizontalAxis{p.X}
-		p.Y.sanitizeRange()
-		y := verticalAxis{p.Y}
+	p.X.sanitizeRange()
+	p.Y.sanitizeRange()
 
-		ywidth := y.size()
-		xheight := x.size()
+	x := horizontalAxis{p.X}
+	y := verticalAxis{p.Y}
 
-		cx := padX(p, draw.Crop(c, ywidth, 0, 0, 0))
-		for _, b := range x.GlyphBoxes(nil) {
-			drawBox(cx, b)
-		}
+	ywidth := y.size()
+	xheight := x.size()
 
-		cy := padY(p, draw.Crop(c, 0, 0, xheight, 0))
-		for _, b := range y.GlyphBoxes(nil) {
-			drawBox(cy, b)
-		}
+	cx := padX(p, draw.Crop(c, ywidth, 0, 0, 0))
+	for _, b := range x.GlyphBoxes(nil) {
+		drawBox(cx, b)
+	}
+
+	cy := padY(p, draw.Crop(c, 0, 0, xheight, 0))
+	for _, b := range y.GlyphBoxes(nil) {
+		drawBox(cy, b)
 	}
 }
 
