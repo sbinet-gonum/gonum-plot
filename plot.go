@@ -232,6 +232,11 @@ func (p *Plot) DrawGlyphBoxes(c draw.Canvas) {
 	for _, b := range y.GlyphBoxes(nil) {
 		drawBox(cy, b)
 	}
+
+	cl := draw.Crop(c, ywidth, 0, xheight, 0)
+	for _, b := range p.Legend.GlyphBoxes(p) {
+		drawBox(cl, b)
+	}
 }
 
 // padX returns a draw.Canvas that is padded horizontally

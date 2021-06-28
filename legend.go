@@ -170,6 +170,11 @@ func (l *Legend) Rectangle(c draw.Canvas) vg.Rectangle {
 	return r
 }
 
+func (l *Legend) GlyphBoxes(*Plot) (boxes []GlyphBox) {
+	// TODO
+	return
+}
+
 // entryHeight returns the height of the tallest legend
 // entry text.
 func (l *Legend) entryHeight() (height vg.Length) {
