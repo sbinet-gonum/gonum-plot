@@ -299,7 +299,9 @@ func (a horizontalAxis) GlyphBoxes(*Plot) []GlyphBox {
 	var (
 		boxes []GlyphBox
 		ext   = a.Tick.Label.FontExtents()
-		desc  = ext.Height - ext.Ascent // descent + linegap
+		//desc  = ext.Height - ext.Ascent // descent + linegap
+		//desc = ext.Descent
+		desc = 2*ext.Height - ext.Ascent
 	)
 	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max) {
 		if t.IsMinor() {
@@ -418,6 +420,8 @@ func (a verticalAxis) GlyphBoxes(*Plot) []GlyphBox {
 		}
 		box.Rectangle.Min.Y += desc
 		box.Rectangle.Max.Y += desc
+		box.Rectangle.Min.X += 4 * desc
+		box.Rectangle.Max.X += 4 * desc
 		boxes = append(boxes, box)
 	}
 	return boxes
